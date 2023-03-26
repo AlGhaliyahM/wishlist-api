@@ -73,8 +73,6 @@ export class WishlistService {
 
       // Use .each method to loop through the selected css
       wishlistItems.each((i, el) => {
-        // const Itemdata: WishlistData;
-        // const Itemdata = { name: '', price: '', img: '', itemUrl: '' };
         wishlists.push({
           item_name: $(el).find('div.b-wishlist-tile__name').text(),
           item_price: $(el).find('span.b-price__value').attr('content'),
@@ -84,8 +82,6 @@ export class WishlistService {
           item_url:
             domain + $(el).find('.b-wishlist-tile__image-link').attr('href'),
         });
-
-        // wishlists.push(Itemdata);
       });
       console.log(wishlists);
       return wishlists;
