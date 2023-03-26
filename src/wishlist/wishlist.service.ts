@@ -1,11 +1,10 @@
-import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { NestCrawlerService } from 'nest-crawler';
 import { Wishlist } from './wishlist.interface';
 import { WishlistData } from './wishlistData.interface';
 import * as cheerio from 'cheerio';
-import * as request from 'request';
 import axios from 'axios';
-import { type } from 'os';
+
 @Injectable()
 export class WishlistService {
   constructor(private readonly crawler: NestCrawlerService) {}
