@@ -1,3 +1,3 @@
-export interface Wishlist {
+export interface WishlistUrl {
   wishlistUrl: string;
 }

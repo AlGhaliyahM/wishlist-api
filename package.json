@@ -1,8 +1,8 @@
 {
   "name": "wishlist-scraper-api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Wishlist Importer Backend API",
+  "author": "Alghaliyah",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

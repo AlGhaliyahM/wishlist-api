@@ -1,28 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { NestCrawlerService } from 'nest-crawler';
-import { Wishlist } from './wishlist.interface';
+import { WishlistUrl } from './wishlist.interface';
 import { WishlistData } from './wishlistData.interface';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
+import { InjectModel } from '@nestjs/mongoose';
+import { WishlistDocument, Wishlist } from './wishlist.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class WishlistService {
-  constructor(private readonly crawler: NestCrawlerService) {}
+  constructor(
+    @InjectModel(Wishlist.name) private wishlistModel: Model<WishlistDocument>,
+  ) {}
 
   TODO: '1-Validate URL 2-if valid proceed with scraping the data';
 
-  async wishlistScraper(url: Wishlist) {
+  async wishlistScraper(url: WishlistUrl) {
     console.log(url.wishlistUrl);
 
     //check if the url in valid format
     if (this.isValidUrl(url.wishlistUrl)) {
       return this.scrapeData(url.wishlistUrl);
     }
-
     //return success or fail response based on the condition
     //return the data for the given wishlist url
     /*
-
         {
             id:00
             wishlistUrl: " "
@@ -30,13 +32,11 @@ export class WishlistService {
             item_price: string; 
             item_img: string;
             item_url: string;
+            item_description:
             created_at:00:00:00
             updated_at:00:00:00
         }
-
-
      */
-    return url;
   }
 
   //Validate Url format method
@@ -80,47 +80,15 @@ export class WishlistService {
             .find('.b-product-tile__image-img.tile-image.js-product__image')
             .attr('src'),
           item_url:
-            domain + $(el).find('.b-wishlist-tile__image-link').attr('href'),
+            'https://' +
+            domain +
+            $(el).find('.b-wishlist-tile__image-link').attr('href'),
         });
       });
       console.log(wishlists);
       return wishlists;
     } catch (error) {}
   }
+
+  //   async amazonWishlistScraper(url: string): Promise<WishlistData[]> {}
 }
-
-// async scrape(url: string): Promise<void> {
-//     const $ = cheerio.load(url);
-
-//     interface WishlistData {
-//       item_name: string;
-//       item_price: string; // later change to double
-//       item_img: string;
-//       item_url: string;
-//     }
-
-//     const data: WishlistData[] = await this.crawler.fetch({
-//       target: url,
-
-//       fetch: {
-//         item_name: {
-//           selector: '.b-wishlist-tile__name',
-//         },
-//         item_price: {
-//           selector: '.b-price__value',
-//           attr: 'content',
-//         },
-//         item_img: {
-//           selector: '.b-product-tile__image-img tile-image js-product__image',
-//           attr: 'src',
-//         },
-//         item_url: {
-//           selector: '.b-wishlist-tile__image-link',
-//           attr: 'href',
-//         },
-//         //fetch the feild in the HTML page for the given url
-//       },
-//     });
-
-//     console.log(data);
-//   }

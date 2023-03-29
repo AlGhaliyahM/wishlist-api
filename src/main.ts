@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import Colors = require('colors.ts');
 Colors.enable();
 import * as dotenv from 'dotenv';
+import { connectDB } from './config/db';
 dotenv.config();
 
 async function bootstrap() {
@@ -14,5 +15,6 @@ async function bootstrap() {
         .bold,
     ),
   );
+  connectDB();
 }
 bootstrap();
