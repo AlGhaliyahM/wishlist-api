@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { WishlistDocument, Wishlist } from './wishlist.schema';
-import { Model } from 'mongoose';
+import { Model, now } from 'mongoose';
 
 @Injectable()
 export class WishlistService {
@@ -16,35 +16,33 @@ export class WishlistService {
   TODO: '1-Validate URL 2-if valid proceed with scraping the data';
 
   async wishlistScraper(url: WishlistUrl) {
-    console.log(url.wishlistUrl);
+    let wishlists: WishlistData[] = [];
 
     //check if the url in valid format
     if (this.isValidUrl(url.wishlistUrl)) {
-      return this.scrapeData(url.wishlistUrl);
+      wishlists = await this.scrapeData(url.wishlistUrl);
+
+      const objModel = new this.wishlistModel();
+      objModel.items = wishlists;
+      objModel.Url = url.wishlistUrl;
+
+      objModel.save();
+      return {
+        sucess: true,
+        data: objModel,
+      };
+    } else {
+      return {
+        sucess: false,
+        error: 'Please provide valid wishlist URL',
+      };
     }
-    //return success or fail response based on the condition
-    //return the data for the given wishlist url
-    /*
-        {
-            id:00
-            wishlistUrl: " "
-            item_name: string;
-            item_price: string; 
-            item_img: string;
-            item_url: string;
-            item_description:
-            created_at:00:00:00
-            updated_at:00:00:00
-        }
-     */
   }
 
   //Validate Url format method
   isValidUrl(url: string) {
     try {
       let Url = new URL(url);
-      let domain = Url.hostname;
-      //   console.log(domain);
       return Boolean(Url);
     } catch (e) {
       return false;
@@ -55,7 +53,7 @@ export class WishlistService {
   async scrapeData(url: string): Promise<WishlistData[]> {
     let Url = new URL(url);
     let domain = Url.hostname;
-    console.log(domain);
+    // console.log(domain);
 
     const wishlists: WishlistData[] = [];
 
@@ -85,7 +83,7 @@ export class WishlistService {
             $(el).find('.b-wishlist-tile__image-link').attr('href'),
         });
       });
-      console.log(wishlists);
+
       return wishlists;
     } catch (error) {}
   }

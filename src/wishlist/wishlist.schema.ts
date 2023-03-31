@@ -1,16 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { timeStamp } from 'console';
+import { Date, HydratedDocument, now } from 'mongoose';
 import { WishlistData } from 'src/wishlist/wishlistData.interface';
 
 export type WishlistDocument = HydratedDocument<Wishlist>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Wishlist {
   @Prop()
+  Url: string;
+
+  @Prop([])
   items: WishlistData[];
-  @Prop()
-  created_at: Date;
-  @Prop()
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: Date })
   updated_at: Date;
 }
 
