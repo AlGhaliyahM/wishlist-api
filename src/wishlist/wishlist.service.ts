@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { WishlistUrl } from './wishlist.interface';
 import { WishlistData } from './wishlistData.interface';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { WishlistDocument, Wishlist } from './wishlist.schema';
-import { Model, now } from 'mongoose';
-
+import { Model } from 'mongoose';
+import { Cron, CronExpression } from '@nestjs/schedule';
 @Injectable()
 export class WishlistService {
   constructor(
     @InjectModel(Wishlist.name) private wishlistModel: Model<WishlistDocument>,
   ) {}
+  private readonly logger = new Logger(WishlistService.name);
 
   TODO: '1-Validate URL 2-if valid proceed with scraping the data';
 
@@ -25,8 +26,8 @@ export class WishlistService {
       const objModel = new this.wishlistModel();
       objModel.items = wishlists;
       objModel.Url = url.wishlistUrl;
-
       objModel.save();
+
       return {
         sucess: true,
         data: objModel,
@@ -50,7 +51,7 @@ export class WishlistService {
   }
 
   // ScrapData for mama&papas wishlist URL
-  async scrapeData(url: string): Promise<WishlistData[]> {
+  async scrapeData(url: string): Promise<WishlistData[] | any> {
     let Url = new URL(url);
     let domain = Url.hostname;
     // console.log(domain);
@@ -86,6 +87,21 @@ export class WishlistService {
 
       return wishlists;
     } catch (error) {}
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async cronJob() {
+    this.logger.debug('Called every hour');
+
+    let wishlists = [];
+    wishlists = await this.wishlistModel.find().exec();
+
+    for (const element of wishlists) {
+      let data = await this.scrapeData(element.Url);
+      this.wishlistModel
+        .findOneAndUpdate({ Url: element.Url }, { items: data })
+        .exec();
+    }
   }
 
   //   async amazonWishlistScraper(url: string): Promise<WishlistData[]> {}

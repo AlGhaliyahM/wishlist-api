@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { timeStamp } from 'console';
-import { Date, HydratedDocument, now } from 'mongoose';
+import { Date, HydratedDocument } from 'mongoose';
 import { WishlistData } from 'src/wishlist/wishlistData.interface';
 
 export type WishlistDocument = HydratedDocument<Wishlist>;
