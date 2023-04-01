@@ -14,13 +14,20 @@ export class WishlistService {
   ) {}
   private readonly logger = new Logger(WishlistService.name);
 
-  TODO: '1-Validate URL 2-if valid proceed with scraping the data';
-
   async wishlistScraper(url: WishlistUrl) {
     let wishlists: WishlistData[] = [];
 
     //check if the url in valid format
     if (this.isValidUrl(url.wishlistUrl)) {
+      const foundUrl = await this.wishlistModel.findOne({
+        Url: url.wishlistUrl,
+      });
+      if (foundUrl) {
+        return {
+          sucess: false,
+          error: 'Wishlist Url is already exist',
+        };
+      }
       wishlists = await this.scrapeData(url.wishlistUrl);
 
       const objModel = new this.wishlistModel();
@@ -54,8 +61,6 @@ export class WishlistService {
   async scrapeData(url: string): Promise<WishlistData[] | any> {
     let Url = new URL(url);
     let domain = Url.hostname;
-    // console.log(domain);
-
     const wishlists: WishlistData[] = [];
 
     try {
@@ -92,7 +97,6 @@ export class WishlistService {
   @Cron(CronExpression.EVERY_HOUR)
   async cronJob() {
     this.logger.debug('Called every hour');
-
     let wishlists = [];
     wishlists = await this.wishlistModel.find().exec();
 
